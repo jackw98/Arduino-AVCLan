@@ -9,7 +9,7 @@
 
 #include <avr/pgmspace.h>
 #include "AVCLanDrv.h"
-#include "WProgram.h"
+#include "Arduino.h"
 
 // timer1 overflow every 1 sec 
 #define TI1_H	(((word)-(F_CPU / 1024)) >> 8)
@@ -26,8 +26,8 @@
 #define AVCLANDEVICE_NAME    " CD changer"
 #define AVCLANDEVICE_VERSION "0.2.2"
 
-extern AvcOutMessage CmdReset; // reset AVCLan. This causes HU to send ACT_REGISTER
-extern AvcOutMessage CmdRegister; // register CD changer
+// extern AvcOutMessage CmdReset; // reset AVCLan. This causes HU to send ACT_REGISTER
+// extern AvcOutMessage CmdRegister; // register CD changer
 // extern AvcOutMessage *CmdTest; // test message
 
 

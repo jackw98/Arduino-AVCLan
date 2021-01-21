@@ -7,7 +7,7 @@
 #ifndef AVCLanDrv_h
 #define AVCLanDrv_h
 
-#include "WProgram.h"
+#include "Arduino.h"
 #include "config.h"
 
 #define AVCLANDRV_VERSION "0.3.1"

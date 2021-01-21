@@ -4,8 +4,8 @@
 */
 
 // type of AVCLan hardwire driver
-//#define AVCLAN_ST485
-#define AVCLAN_PCA82C250
+#define AVCLAN_ST485
+//#define AVCLAN_PCA82C250
 //#define AVCLAN_MINI_PCA82C250
 //#define AVCLAN_RESISTOR
 

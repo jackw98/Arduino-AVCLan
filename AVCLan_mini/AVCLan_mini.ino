@@ -1,3 +1,7 @@
+#include <AVCLanCDch.h>
+#include <AVCLanDrv.h>
+#include <config.h>
+
 /*
  AVCLan mini, connecting 'duino to AVCLan bus. 
  Created by Kochetkov Aleksey, 04.08.2010
@@ -7,8 +11,6 @@
 #define AVCLAN_VERSION "0.1.7"
 
 #include <EEPROM.h>
-#include <AVCLanDrv.h>
-#include <AVCLanCDch.h>
 #include <BuffSerial.h>
 #include <config.h>
 
@@ -19,11 +21,11 @@ byte s_c[2];
 byte data_tmp[32];
 byte i;
 
-// адреса eeprom
-#define E_MASTER1	0  // адрес головы, старший байт
-#define E_MASTER2	1  // адрес головы, младший байт
-#define E_READONLY  2  // режим "только чтение", если 1, то устройств не регистрируем, только слушаем шину
-#define E_INIT		3  // признак инициализации EEPROM
+// eeprom address
+#define E_MASTER1	0  // head address, high byte
+#define E_MASTER2	1  // head address, low byte
+#define E_READONLY  2  // "read-only" mode, if 1, then we do not register devices, only listen to the bus
+#define E_INIT		3  // initialization flag EEPROM
 
 #define LED_ON	sbi(LED_PORT, LED_OUT);
 #define LED_OFF	cbi(LED_PORT, LED_OUT);
@@ -37,7 +39,7 @@ void setup(){
 	avclan.begin();
 	avclanDevice.begin();
 	EERPOM_read_config();
-	bSerial.print_p(PSTR("AVCLan mini. Kochetkov Aleksey. v"));
+	bSerial.println("AVCLan mini. Kochetkov Aleksey. v");
 	bSerial.println(AVCLAN_VERSION);
 	bSerial.println();
 }
@@ -47,16 +49,29 @@ void loop(){
 	if (INPUT_IS_SET){
 		LED_ON;
 		byte res = avclan.readMessage();
+    //bSerial.printHex8(res);
+    //bSerial.println(); //TEST 00 means message rxed successfully?
 		LED_OFF;
+    
 		if (!res){
-			if (!avclan.readonly) avclanDevice.getActionID();
-			if (avclan.actionID != ACT_NONE) {
-				avclanDevice.processAction((AvcActionID)avclan.actionID);
+			if (!avclan.readonly) {
+        avclanDevice.getActionID();
+        //bSerial.println("not read only");
 			}
+			if (avclan.actionID != ACT_NONE) {
+        
+				avclanDevice.processAction((AvcActionID)avclan.actionID);
+        //bSerial.println("action ID not ACT_NONE");
+			}
+      else{
+        //bSerial.printHex8(avclan.actionID); //TEST
+        //bSerial.println(" - action ID");
+      }
 		}
 	}
 
 	if (avclan.event != EV_NONE){
+    //bSerial.println("Not EV_NONE");
 		avclanDevice.processEvent((AvcEventID)avclan.event);
 		avclan.event = EV_NONE;
 	}
@@ -196,11 +211,11 @@ void sendMess(){
 	byte res = avclan.sendMessage();
 }
 
-// Чтение конфигурации из EEPROM
+// Reading configuration from EEPROM
 void EERPOM_read_config(){
 	if (EEPROM.read(E_INIT) != 'T'){
 		EEPROM.write(E_MASTER1, 0x01);
-		EEPROM.write(E_MASTER2, 0x40);
+		EEPROM.write(E_MASTER2, 0x90);
 		EEPROM.write(E_READONLY, 0);
 		EEPROM.write(E_INIT, 'T');
 	}else{
@@ -208,5 +223,3 @@ void EERPOM_read_config(){
 		avclan.readonly    = EEPROM.read(E_READONLY);
 	}
 }
-
-
